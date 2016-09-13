@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<script src="http://code.jquery.com/jquery-3.1.0.js" integrity="sha256-slogkvB1K3VOkzAI8QITxV3VzpOnkeNVsKvtkYLMjfk=" crossorigin="anonymous"></script>
+	<script src="http://code.jquery.com/ui/1.12.0/jquery-ui.js" integrity="sha256-0YPKAwZP7Mp3ALMRVB2i8GXeEndvCq3eSl/WsAl1Ryk=" crossorigin="anonymous"></script>
+	<link rel="stylesheet" type="text/css" href="ph-buttons.css">
+	<style type="text/css">
+		
+		#outbox {
+			border: 4px solid black;
+			width: 1200px;
+			display: inline-block;
+			overflow:hidden;
+
+		}
+		#titlebar {
+			text-align: center;
+			width:1200px;
+		}
+		canvas {
+			float:left;
+			border: 4px solid black;
+			/*margin: 60px 50px 100px 230px;*/
+			margin-top:60px;
+			margin-right:50px;
+			margin-bottom:100px;
+			margin-left:70px;
+			overflow:hidden;
+
+		}		
+		#btn_panel_left {
+			border:1px dotted black;
+			vertical-align: middle;
+			display: inline-block;
+			float:left;
+			margin-top:70px;
+			width:180px;
+			height:100%;
+		}
+		#btn_panel_left>* {
+		    width:100px;
+		    margin-left:30px;
+		}
+		#color_panel>* {
+			width:30px;
+			height:30px;
+			background-color: black;
+			float:left;
+			margin:1.5px;
+		}
+		#color_panel {
+
+			margin-top: 10px;
+			margin-bottom: 2.5cm;
+		}
+
+		#box_black {
+			background-color: black;
+		}
+		#box_red {
+			background-color: red;
+		}
+		#box_green {
+			background-color: green;
+		}
+		#box_blue {
+			background-color: blue;
+		}
+		#box_brown {
+			background-color: brown;
+		}
+		#box_purple {
+			background-color: purple;
+		}
+		#bth_panel_bottom {
+			/*width:1200px;	*/
+			align-content: center;
+			float:left;
+			overflow:hidden;
+			display: inline-block;
+			margin-left:500px;
+		}
+		#bth_panel_bottom>* {
+			float:left;
+			/*vertical-align: middle;*/
+			margin:10px;
+			width:100px;
+			
+		}
+		#thick_panel {
+			width:80px;
+		}
+		#thick_panel>* {
+			background-color: black;
+			margin:10px;
+		}
+		#line_thick1 {
+			height: 2px;
+		}
+		#line_thick2 {
+			height: 4px;
+		}
+		#line_thick3 {
+			height: 6px;
+		}
+		#line_thick4 {
+			height: 8px;
+		}
+	</style>
+	<title>2D Simple Graphic Editor</title>
+
+</head>
+<body>
+	<p id="titlebar">2D Simple Graphic Editor</p>
+	<div id="outbox">
+		<div id="btn_panel_left">
+		
+		        <div id="btn_segment" class='ph-button ph-btn-red'>선분</div>
+		        <div id="btn_circle" class='ph-button ph-btn-red'>원</div>
+		        <div id="btn_quad" class='ph-button ph-btn-red'>사각형</div>
+		        <div id="btn_polygon" class='ph-button ph-btn-red'>다각형</div>
+		        <div id="btn_curve" class='ph-button ph-btn-red'>곡선</div>
+		        <div id="btn_fillcolor" class='ph-button ph-btn-red'>색 채우기</div>
+		        <div id="color_panel">
+		        	<div id="box_black"></div>
+		        	<div id="box_red"></div>
+		        	<div id="box_green"></div>
+		        	<div id="box_blue"></div>
+		        	<div id="box_brown"></div>
+		        	<div id="box_purple"></div>
+		        </div>
+		        <div id="btn_pattern" class='ph-button ph-btn-red'>패턴</div>
+		        <p><b>선 색</b></p>
+		        <div id="color_panel">
+		        	<div id="box_black"></div>
+		        	<div id="box_red"></div>
+		        	<div id="box_green"></div>
+		        	<div id="box_blue"></div>
+		        	<div id="box_brown"></div>
+		        	<div id="box_purple"></div>
+		        </div>
+		        <p><b>선 굵기</b></p>
+		        <div id="thick_panel">
+		        	<div id="line_thick1"></div>
+		        	<div id="line_thick2"></div>
+		        	<div id="line_thick3"></div>
+		        	<div id="line_thick4"></div>
+		        </div>
+
+
+		</div>
+
+		<canvas id="canvas" width="830" height="700">This browser doesn't support canvas. Use another browser.</canvas>
+		<div id="bth_panel_bottom">
+			<div id="btn_load" class='ph-button ph-btn-green'>불러오기</div>
+			<div id="btn_save" class='ph-button ph-btn-green'>저장</div>
+		</div>
+	</div>
+</body>
+</html>
