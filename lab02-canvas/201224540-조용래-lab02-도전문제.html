@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>canvas lab</title>
+	<script type="text/javascript">
+		var drawMode = 0;
+		var DRAW_FIRST_CLICK = 1;
+		var DRAW_FIRST_OFF = 2;
+		var DRAW_RECT = 10;
+		var DRAW_LINE_CONSECUTIVE = 3;
+		var rx = new Array();
+		var ry = new Array();
+		var r_ctr = 0;
+		var ctx;
+		var info;
+		var LINE_WIDTH = 3;
+		var pattern_images = new Array();
+		var nOfImage = 4;
+		pattern_images = ["darth-vader.jpg", "geekchamp-logo.png", "wood-pattern.png", "yoda.jpg"];
+		var images = new Array();
+		var ran_prev = -1;
+		function start() {
+			init_images();
+			var canvas = document.getElementById("mycanvas");
+			ctx = canvas.getContext("2d");
+
+			var left = canvas.offsetLeft;
+			var top = canvas.offsetTop;
+			var x1, y1;
+			var x2, y2;
+			var bufx, bufy;
+			info = document.getElementById("info");
+			canvas.addEventListener('mousedown', function(event) {
+				// left click
+				if (event.button === 0) {
+					console.log("left click");
+					x1 = event.clientX;
+					y1 = event.clientY;
+					console.log("mousedown: " + x1 + "," +y1);
+					console.log("drawMode: " + drawMode);
+					if (drawMode == DRAW_FIRST_CLICK) {
+						ctx.beginPath();
+						ctx.moveTo(x1,y1);
+						drawMode = 2;
+						// consecutive draw mode
+					} else if(drawMode == DRAW_LINE_CONSECUTIVE) {
+						console.log("consecutive:");
+						ctx.lineTo(x1, y1);
+						ctx.lineWidth = LINE_WIDTH;
+
+						ctx.strokeStyle="rgba(255,0,0,1.0)"
+						ctx.stroke();
+
+						ctx.beginPath();
+						ctx.moveTo(x1, y1);
+					} else if(drawMode == DRAW_RECT) {
+						rx[r_ctr] = x1;
+						ry[r_ctr] = y1;
+						++r_ctr;
+						if(r_ctr == 4) {
+							draw_rect(ctx);
+						}
+					}
+				}
+				// right click
+				if (event.button === 2) {
+					console.log("right click");
+					
+					info.innerHTML = "해제 모드";
+					drawMode = 0;
+				}
+
+			});
+			canvas.addEventListener('mouseup', function(event) {
+				x2 = event.clientX;
+				y2 = event.clientY;
+				console.log("mouseup: " + x2 + "," +y2);
+				if (drawMode == 2) {
+					console.log("wtf where is this");
+					ctx.lineTo(x2, y2);
+					ctx.lineWidth = LINE_WIDTH;
+					ctx.strokeStyle="rgba(255,0,0,1.0)"
+
+					ctx.stroke();
+					drawMode = 3;
+					ctx.beginPath();
+					ctx.moveTo(x2, y2);
+					bufx = x2;
+					bufy = y2;
+				}
+			});
+		}
+		function draw_scene() {
+			drawMode = 1;
+			var info = document.getElementById("info");
+			info.innerHTML = "그리기 모드";
+
+		}
+		function draw_rect(ctx) {
+			drawMode = 10;
+			info.innerHTML = "사각형 모드"
+			if(r_ctr == 4) {
+				r_ctr = 0;
+
+				ctx.beginPath();
+				ctx.moveTo(rx[0], ry[0]);
+				ctx.lineTo(rx[1], ry[1]);
+				ctx.lineTo(rx[2], ry[2]);
+				ctx.lineTo(rx[3], ry[3]);
+				ctx.closePath();
+				ctx.fillStyle="rgba(100,100,100,0.5)"
+				ctx.fill();
+
+			}
+		}
+		function draw_pattern() {
+			info.innerHTML = "사각형 안에 패턴 표시하기"
+			console.log("draw_pattern");
+			// select given pattern randomly. (darth-vader, geekchamp-logo, wood-pattern, yoda)
+			// select pattern different from the previous
+			var ran = Math.floor((Math.random() * 4) + 0);
+			while(ran == ran_prev) {
+				ran = Math.floor((Math.random() * 4) + 0);
+			}			
+			ran_prev = ran;
+			console.log("ran:" + ran);
+
+			var pattern = ctx.createPattern(images[ran], 'repeat');
+			ctx.beginPath();
+			ctx.moveTo(rx[0], ry[0]);
+			ctx.lineTo(rx[1], ry[1]);
+			ctx.lineTo(rx[2], ry[2]);
+			ctx.lineTo(rx[3], ry[3]);
+			ctx.closePath();
+			ctx.fillStyle = pattern;
+			ctx.fill();
+		}
+		function init_images() {
+			for(var i = 0; i < nOfImage; ++i) {
+				images[i] = new Image();
+				images[i].src = pattern_images[i];
+			}
+		}
+	</script>
+</head>
+<body onload="start()">
+	<canvas id="mycanvas" width="800" height="600" style="background:yellow">
+		Your browser doesn't support canvas!
+	</canvas>
+	<button id="draw" onclick="draw_scene()" >
+		그리기
+	</button>
+	<button id = "rect" onclick="draw_rect()">사각형</button>
+	<button id = "pattern" onclick='draw_pattern()'>패턴채우기</button>
+	<div id="info"></div>
+	<img src="darth-vader.jpg" id="darth-vader" width="40px" height="40px">
+</body>
+</html>

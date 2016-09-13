@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+	<title>canvas lab</title>
+	<script type="text/javascript">
+		var is_draw_mode = 0;
+		function start() {
+			var canvas = document.getElementById("mycanvas");
+			var ctx = canvas.getContext("2d");
+
+			var left = canvas.offsetLeft;
+			var top = canvas.offsetTop;
+			var x1, y1;
+			var x2, y2;
+
+			canvas.addEventListener('mousedown', function(event) {
+				// left click
+				if (event.button === 0) {
+					console.log("left click");
+					x1 = event.clientX;
+					y1 = event.clientY;
+					console.log("mousedown: " + x1 + "," +y1);
+					if (is_draw_mode == 1) {
+						ctx.beginPath();
+						ctx.moveTo(x1,y1);
+						is_draw_mode = 2;
+						
+					}
+				}
+				// right click
+				if (event.button === 2) {
+					console.log("right click");
+					var info = document.getElementById("info");
+					info.innerHTML = "해제 모드";
+				}
+
+			});
+			canvas.addEventListener('mouseup', function(event) {
+				x2 = event.clientX;
+				y2 = event.clientY;
+				console.log("mouseup: " + x2 + "," +y2);
+				if (is_draw_mode == 2) {
+					ctx.lineTo(x2, y2);
+					ctx.stroke();
+					is_draw_mode = 0;
+				}
+			});
+		}
+		function draw_scene() {
+			is_draw_mode = 1;
+			var info = document.getElementById("info");
+			info.innerHTML = "그리기 모드";
+
+		}
+	</script>
+</head>
+<body onload="start()">
+<canvas id="mycanvas" width="500" height="300" style="background:yellow">
+Your browser doesn't support canvas!
+</canvas>
+<button id="draw" onclick="draw_scene()" >
+그리기
+</button>
+<div id="info"></div>
+</body>
+</html>
