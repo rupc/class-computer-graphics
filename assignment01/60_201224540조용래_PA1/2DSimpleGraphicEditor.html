@@ -110,17 +110,50 @@
 	</style>
 	<script type="text/javascript">
 		var ctx;
-		var LEFT_CLICK = 0, RIGHT_CLICK = 2;
 		var vertex_buffer = new Array();
-		var draw_mode = -1;
-		var MODE_SEGMENT = 0, MODE_CIRCLE = 1, MODE_QUAD = 2, MODE_POLYGON = 3, MODE_CURVE = 4;
+		var draw_mode = 0x00;
+		var LEFT_CLICK = 0,
+		 	RIGHT_CLICK = 2;
+		const MODE_NO_DRAW = 0x00,
+			  MODE_SEGMENT = 0x01,
+			  MODE_CIRCLE = 0x02,
+			  MODE_QUAD = 0x04,
+			  MODE_POLYGON = 0x08,
+			  MODE_CURVE = 0x10;
+		var line_thickness = 2;
+		const COLOR_RED = "rgba(255,0,0,1.0)",
+			  COLOR_BLACK = "rgba(0,0,0,1.0)",
+			  COLOR_GREEN = "rgba(0,128,0,1.0)",
+			  COLOR_BLUE = "rgba(0,0,255,1)",
+			  COLOR_BROWN = "rgba(128,0,0,1)",
+			  COLOR_PURPLE = "rgba(128,0,128,1)";
+		var line_color = COLOR_BLACK;
+		var pattern_color = COLOR_BLACK;
+
 		function start() {
 			var canvas = document.getElementById("canvas");
 			ctx = canvas.getContext("2d");
 			canvas.addEventListener('mousedown', get_vertex);
 			canvas.addEventListener('mouseup', draw_vertex);
+		
+		}
+		function select_lcolor(v) {
+			line_color = v.getAttribute("lcolor");
+			console.log("line color : " + line_color);
+		}
+		function select_lthick(v) {
+			line_thickness = v.getAttribute("lthick");
+			console.log("line thickness : " + line_thickness);
+		}
+		function select_pcolor(v) {
+			pattern_color = v.getAttribute("pcolor");
+			console.log("pattern color : " + pattern_color);
 		}
 		function get_vertex(event) {
+			if (draw_mode == MODE_NO_DRAW) {
+				console.log("No draw mode");
+				return;
+			}
 			if (event.button == LEFT_CLICK) {
 				var xy = get_mouse_position(canvas, event);
 				console.log(xy[0] + ":" + xy[1]);		
@@ -130,10 +163,26 @@
 			}
 		}
 		function draw_vertex(event) {
+			if (draw_mode == MODE_NO_DRAW) {
+				console.log("No draw mode");
+				return;
+			}
 			if (event.button == LEFT_CLICK) {
-					
+				var xy = get_mouse_position(canvas, event);
+				console.log(xy[0] + ":" + xy[1]);
+				vertex_buffer.push(xy);
+				draw_shapes(draw_mode);
 			} else if (event.button == RIGHT_CLICK) {
 					
+			}
+		}
+		function draw_shapes(mode) {
+			switch (mode) {
+				case MODE_SEGMENT:
+					draw_segment();
+					break;
+				default:
+					console.log("nothing selected");
 			}
 		}
 		function get_mouse_position(canvas, event) {
@@ -144,8 +193,22 @@
 		}
 		function switch_draw_mode(MODE) {
 			draw_mode = MODE;
+			console.log("switch draw mode : " + draw_mode);
 		}
 		function draw_segment() {
+			var src = vertex_buffer[0];
+			var dst = vertex_buffer[1];
+			vertex_buffer.pop();
+			vertex_buffer.pop();
+			ctx.beginPath();
+			ctx.moveTo(src[0], src[1]);
+			ctx.lineTo(dst[0], dst[1]);
+			ctx.lineWidth = line_thickness;
+			ctx.strokeStyle = line_color;
+			ctx.stroke();
+			console.log("drawSegment");
+			console.log("lineColor:" + line_color);
+			console.log("lineWidth:" + line_thickness);
 		}
 		function draw_circle() {
 		}
@@ -164,43 +227,42 @@
 
 </head>
 <body oncontextmenu="return false;" onload="start()">
-	<p id="titlebar">2D Simple Graphic Editor</p>
+	<p id="titlebar"><b>2D Simple Graphic Editor</b></p>
 	<div id="outbox">
 		<div id="btn_panel_left">
 		
-		        <div id="btn_segment" class='ph-button ph-btn-red' onclick="switch_draw_mode(0)">선분</div>
-		        <div id="btn_circle" class='ph-button ph-btn-red' onclick="switch_draw_mode(1)">원</div>
-		        <div id="btn_quad" class='ph-button ph-btn-red' onclick="switch_draw_mode(2)">사각형</div>
-		        <div id="btn_polygon" class='ph-button ph-btn-red' onclick="switch_draw_mode(3)">다각형</div>
-		        <div id="btn_curve" class='ph-button ph-btn-red' onclick="switch_draw_mode(4)">곡선</div>
+		        <div id="btn_segment" class='ph-button ph-btn-red' onclick="switch_draw_mode(0x01)">선분</div>
+		        <div id="btn_circle" class='ph-button ph-btn-red' onclick="switch_draw_mode(0x02)">원</div>
+		        <div id="btn_quad" class='ph-button ph-btn-red' onclick="switch_draw_mode(0x04)">사각형</div>
+		        <div id="btn_polygon" class='ph-button ph-btn-red' onclick="switch_draw_mode(0x08)">다각형</div>
+		        <div id="btn_curve" class='ph-button ph-btn-red' onclick="switch_draw_mode(0x10)">곡선</div>
 		        <div id="btn_fillcolor" class='ph-button ph-btn-red' onclick="fill_color()">색 채우기</div>
-		        <div id="color_panel">
-		        	<div id="box_black"></div>
-		        	<div id="box_red"></div>
-		        	<div id="box_green"></div>
-		        	<div id="box_blue"></div>
-		        	<div id="box_brown"></div>
-		        	<div id="box_purple"></div>
-		        </div>
+		     <div id="color_panel">
+		        	<div id="box_black" onclick="select_pcolor(this)" pcolor="black"></div>
+		        	<div id="box_red" onclick="select_pcolor(this)" pcolor="red"></div>
+		        	<div id="box_green" onclick="select_pcolor(this)" pcolor="green"></div>
+		        	<div id="box_blue" onclick="select_pcolor(this)" pcolor="blue"></div>
+		        	<div id="box_brown" onclick="select_pcolor(this)" pcolor="brown"></div>
+		        	<div id="box_purple" onclick="select_pcolor(this)" pcolor="purple"></div>
+		     </div>
 		        <div id="btn_pattern" class='ph-button ph-btn-red' onclick="fill_pattern()">패턴</div>
 		        <p><b>선 색</b></p>
 		        <div id="color_panel">
-		        	<div id="box_black"></div>
-		        	<div id="box_red"></div>
-		        	<div id="box_green"></div>
-		        	<div id="box_blue"></div>
-		        	<div id="box_brown"></div>
-		        	<div id="box_purple"></div>
+		        	<div id="box_black" onclick="select_lcolor(this)" lcolor="black"></div>
+		        	<div id="box_red" onclick="select_lcolor(this)" lcolor="red"></div>
+		        	<div id="box_green" onclick="select_lcolor(this)" lcolor="green"></div>
+		        	<div id="box_blue" onclick="select_lcolor(this)" lcolor="blue"></div>
+		        	<div id="box_brown" onclick="select_lcolor(this)" lcolor="brown"></div>
+		        	<div id="box_purple" onclick="select_lcolor(this)" lcolor="purple"></div>
+
 		        </div>
 		        <p><b>선 굵기</b></p>
 		        <div id="thick_panel">
-		        	<div id="line_thick1"></div>
-		        	<div id="line_thick2"></div>
-		        	<div id="line_thick3"></div>
-		        	<div id="line_thick4"></div>
+		        	<div id="line_thick1" onclick="select_lthick(this)" lthick="2"></div>
+		        	<div id="line_thick2" onclick="select_lthick(this)" lthick="4"></div>
+		        	<div id="line_thick3" onclick="select_lthick(this)" lthick="6"></div>
+		        	<div id="line_thick4" onclick="select_lthick(this)" lthick="8"></div>
 		        </div>
-
-
 		</div>
 
 		<canvas id="canvas" width="830" height="700">This browser doesn't support canvas. Use another browser.</canvas>
