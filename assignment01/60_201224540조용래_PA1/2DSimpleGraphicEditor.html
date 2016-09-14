@@ -127,9 +127,9 @@
 			  COLOR_BLUE = "rgba(0,0,255,1)",
 			  COLOR_BROWN = "rgba(128,0,0,1)",
 			  COLOR_PURPLE = "rgba(128,0,128,1)";
-		var line_color = COLOR_BLACK;
-		var pattern_color = COLOR_BLACK;
-
+		var line_color = COLOR_BLACK,
+			pattern_color = COLOR_BLACK;
+		var quad_ctr = 0;
 		function start() {
 			var canvas = document.getElementById("canvas");
 			ctx = canvas.getContext("2d");
@@ -158,6 +158,9 @@
 				var xy = get_mouse_position(canvas, event);
 				console.log(xy[0] + ":" + xy[1]);		
 				vertex_buffer.push(xy);
+				if (draw_mode == MODE_QUAD) {
+					quad_ctr++;
+				}
 			} else if (event.button == RIGHT_CLICK) {
 
 			}
@@ -168,12 +171,24 @@
 				return;
 			}
 			if (event.button == LEFT_CLICK) {
-				var xy = get_mouse_position(canvas, event);
-				console.log(xy[0] + ":" + xy[1]);
-				vertex_buffer.push(xy);
-				draw_shapes(draw_mode);
+				if (draw_mode == MODE_SEGMENT ||
+					draw_mode == MODE_CIRCLE) {
+					var xy = get_mouse_position(canvas, event);
+					console.log(xy[0] + ":" + xy[1]);
+					vertex_buffer.push(xy);
+					draw_shapes(draw_mode);
+				} else if (draw_mode == MODE_QUAD) {
+					if (quad_ctr == 4) {
+						quad_ctr = 0;
+						draw_shapes(draw_mode);
+					}
+				}
 			} else if (event.button == RIGHT_CLICK) {
-					
+				if (draw_mode == MODE_QUAD ||
+					draw_mode == MODE_POLYGON ||
+					draw_mode == MODE_CURVE) {
+					draw_shapes(draw_mode);
+				}
 			}
 		}
 		function draw_shapes(mode) {
@@ -226,7 +241,23 @@
 		}
 		// get 2 vertexes, which is recently pushed from vertex buffer 
 		function get2vertex() {
+			if (vertex_buffer.length < 2) {
+				alert("less than 2");
+				throw new Error("vertex buffer's size is less than 2!");
+			}
 			return [
+				vertex_buffer[vertex_buffer.length-2],
+				vertex_buffer[vertex_buffer.length-1]
+			];
+		}
+		function get4vertex() {
+			if (vertex_buffer.length < 4) {
+				alert("less than 4");
+				throw new Error("vertex buffer's size is less than 4!");
+			}
+			return [
+				vertex_buffer[vertex_buffer.length-4],
+				vertex_buffer[vertex_buffer.length-3],
 				vertex_buffer[vertex_buffer.length-2],
 				vertex_buffer[vertex_buffer.length-1]
 			];
@@ -250,6 +281,19 @@
 			return Math.sqrt(Math.pow(p1[0]-p2[0], 2) + Math.pow(p1[1]-p2[1], 2));
 		}
 		function draw_quad() {
+			var points = get4vertex();
+			ctx.beginPath();
+			ctx.moveTo(points[0][0], points[0][1]);
+			ctx.lineTo(points[1][0], points[1][1]);
+			ctx.lineTo(points[2][0], points[2][1]);
+			ctx.lineTo(points[3][0], points[3][1]);
+			ctx.closePath();
+			ctx.fillStyle = pattern_color;
+			ctx.fill();
+			ctx.lineWidth = line_thickness;
+			ctx.strokeStyle = line_color;
+			ctx.stroke();
+			console.log("drawQuad");
 		}
 		function draw_polygon() {
 		}
