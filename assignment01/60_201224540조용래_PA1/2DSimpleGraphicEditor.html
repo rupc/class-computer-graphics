@@ -159,7 +159,8 @@
 				var xy = get_mouse_position(canvas, event);
 				console.log(xy[0] + ":" + xy[1]);		
 				vertex_buffer.push(xy);
-				if (draw_mode == MODE_QUAD) {
+				if (draw_mode == MODE_QUAD ||
+					draw_mode == MODE_CURVE) {
 					quad_ctr++;
 				}
 				if (draw_mode == MODE_POLYGON) {
@@ -181,7 +182,8 @@
 					console.log(xy[0] + ":" + xy[1]);
 					vertex_buffer.push(xy);
 					draw_shapes(draw_mode);
-				} else if (draw_mode == MODE_QUAD) {
+				} else if (draw_mode == MODE_QUAD ||
+							draw_mode == MODE_CURVE) {
 					if (quad_ctr == 4) {
 						quad_ctr = 0;
 						draw_shapes(draw_mode);
@@ -229,7 +231,8 @@
 		}
 		function switch_draw_mode(MODE) {
 			draw_mode = MODE;
-			if (draw_mode == MODE_QUAD) {
+			if (draw_mode == MODE_QUAD ||
+				draw_mode == MODE_CURVE) {
 				quad_ctr = 0;
 			} 
 			if (draw_mode == MODE_POLYGON) {
@@ -335,6 +338,13 @@
 			poly_ctr = 0;
 		}
 		function draw_curve() {
+			var points = get4vertex();
+			ctx.beginPath();
+			ctx.moveTo(points[0][0], points[0][1]);
+			ctx.bezierCurveTo(points[1][0], points[1][1],points[2][0], points[2][1], points[3][0], points[3][1]);
+			ctx.lineWidth = line_thickness;
+			ctx.strokeStyle = line_color;
+			ctx.stroke();
 		}
 		function fill_color() {
 		}
