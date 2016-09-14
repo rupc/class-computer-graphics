@@ -108,20 +108,72 @@
 			height: 8px;
 		}
 	</style>
+	<script type="text/javascript">
+		var ctx;
+		var LEFT_CLICK = 0, RIGHT_CLICK = 2;
+		var vertex_buffer = new Array();
+		var draw_mode = -1;
+		var MODE_SEGMENT = 0, MODE_CIRCLE = 1, MODE_QUAD = 2, MODE_POLYGON = 3, MODE_CURVE = 4;
+		function start() {
+			var canvas = document.getElementById("canvas");
+			ctx = canvas.getContext("2d");
+			canvas.addEventListener('mousedown', get_vertex);
+			canvas.addEventListener('mouseup', draw_vertex);
+		}
+		function get_vertex(event) {
+			if (event.button == LEFT_CLICK) {
+				var xy = get_mouse_position(canvas, event);
+				console.log(xy[0] + ":" + xy[1]);		
+				vertex_buffer.push(xy);
+			} else if (event.button == RIGHT_CLICK) {
+
+			}
+		}
+		function draw_vertex(event) {
+			if (event.button == LEFT_CLICK) {
+					
+			} else if (event.button == RIGHT_CLICK) {
+					
+			}
+		}
+		function get_mouse_position(canvas, event) {
+			var rect = canvas.getBoundingClientRect();
+			var x = event.clientX - rect.left;
+			var y = event.clientY - rect.top;	
+			return [x,y];
+		}
+		function switch_draw_mode(MODE) {
+			draw_mode = MODE;
+		}
+		function draw_segment() {
+		}
+		function draw_circle() {
+		}
+		function draw_quad() {
+		}
+		function draw_polygon() {
+		}
+		function draw_curve() {
+		}
+		function fill_color() {
+		}
+		function fill_pattern() {
+		}
+	</script>
 	<title>2D Simple Graphic Editor</title>
 
 </head>
-<body>
+<body oncontextmenu="return false;" onload="start()">
 	<p id="titlebar">2D Simple Graphic Editor</p>
 	<div id="outbox">
 		<div id="btn_panel_left">
 		
-		        <div id="btn_segment" class='ph-button ph-btn-red'>선분</div>
-		        <div id="btn_circle" class='ph-button ph-btn-red'>원</div>
-		        <div id="btn_quad" class='ph-button ph-btn-red'>사각형</div>
-		        <div id="btn_polygon" class='ph-button ph-btn-red'>다각형</div>
-		        <div id="btn_curve" class='ph-button ph-btn-red'>곡선</div>
-		        <div id="btn_fillcolor" class='ph-button ph-btn-red'>색 채우기</div>
+		        <div id="btn_segment" class='ph-button ph-btn-red' onclick="switch_draw_mode(0)">선분</div>
+		        <div id="btn_circle" class='ph-button ph-btn-red' onclick="switch_draw_mode(1)">원</div>
+		        <div id="btn_quad" class='ph-button ph-btn-red' onclick="switch_draw_mode(2)">사각형</div>
+		        <div id="btn_polygon" class='ph-button ph-btn-red' onclick="switch_draw_mode(3)">다각형</div>
+		        <div id="btn_curve" class='ph-button ph-btn-red' onclick="switch_draw_mode(4)">곡선</div>
+		        <div id="btn_fillcolor" class='ph-button ph-btn-red' onclick="fill_color()">색 채우기</div>
 		        <div id="color_panel">
 		        	<div id="box_black"></div>
 		        	<div id="box_red"></div>
@@ -130,7 +182,7 @@
 		        	<div id="box_brown"></div>
 		        	<div id="box_purple"></div>
 		        </div>
-		        <div id="btn_pattern" class='ph-button ph-btn-red'>패턴</div>
+		        <div id="btn_pattern" class='ph-button ph-btn-red' onclick="fill_pattern()">패턴</div>
 		        <p><b>선 색</b></p>
 		        <div id="color_panel">
 		        	<div id="box_black"></div>
