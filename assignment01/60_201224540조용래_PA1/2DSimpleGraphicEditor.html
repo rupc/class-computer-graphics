@@ -181,6 +181,18 @@
 				case MODE_SEGMENT:
 					draw_segment();
 					break;
+				case MODE_CIRCLE:
+					draw_circle();
+					break;
+				case MODE_QUAD:
+					draw_quad();
+					break;
+				case MODE_POLYGON:
+					draw_polygon();
+					break;
+				case MODE_CURVE:
+					draw_curve();
+					break;
 				default:
 					console.log("nothing selected");
 			}
@@ -196,21 +208,46 @@
 			console.log("switch draw mode : " + draw_mode);
 		}
 		function draw_segment() {
-			var src = vertex_buffer[0];
-			var dst = vertex_buffer[1];
-			vertex_buffer.pop();
-			vertex_buffer.pop();
+			var seg = get2vertex();
+			var src = seg[0],
+				dst = seg[1];
+			// vertex_buffer.pop();
+			// vertex_buffer.pop();
 			ctx.beginPath();
 			ctx.moveTo(src[0], src[1]);
 			ctx.lineTo(dst[0], dst[1]);
 			ctx.lineWidth = line_thickness;
 			ctx.strokeStyle = line_color;
 			ctx.stroke();
+			ctx.closePath();
 			console.log("drawSegment");
 			console.log("lineColor:" + line_color);
 			console.log("lineWidth:" + line_thickness);
 		}
+		// get 2 vertexes, which is recently pushed from vertex buffer 
+		function get2vertex() {
+			return [
+				vertex_buffer[vertex_buffer.length-2],
+				vertex_buffer[vertex_buffer.length-1]
+			];
+		}
 		function draw_circle() {
+			var cir = get2vertex();
+			var center = cir[0];
+			var radius = distance_p2p(cir[0], cir[1]);
+			ctx.beginPath();
+			ctx.arc(center[0], center[1], radius, 0, 2*Math.PI, false);
+			ctx.fillStyle = pattern_color;
+			ctx.fill();
+			ctx.lineWidth = line_thickness;
+			ctx.strokeStyle = line_color;
+			ctx.stroke();
+			console.log("drawCircle");
+			console.log("center:" + center[0] + "," + center[1]);
+			console.log("radius:" + radius);
+		}
+		function distance_p2p(p1, p2) {
+			return Math.sqrt(Math.pow(p1[0]-p2[0], 2) + Math.pow(p1[1]-p2[1], 2));
 		}
 		function draw_quad() {
 		}
