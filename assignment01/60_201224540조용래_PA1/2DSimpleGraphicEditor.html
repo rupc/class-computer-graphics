@@ -118,6 +118,15 @@
 		#line_thick4 {
 			height: 8px;
 		}
+		label {
+		   cursor: pointer;
+   /* Style as you please, it will become the visible UI component. */
+		}
+		#btn_pattern {
+		   opacity: 0;
+		   position: absolute;
+		   z-index: -1;
+		}
 	</style>
 	<script type="text/javascript">
 		var ctx;
@@ -131,6 +140,7 @@
 			  MODE_QUAD = 0x04,
 			  MODE_POLYGON = 0x08,
 			  MODE_CURVE = 0x10;
+		var is_img_pattern = false;
 		var line_thickness = 2;
 		const COLOR_RED = "rgba(255,0,0,1.0)",
 			  COLOR_BLACK = "rgba(0,0,0,1.0)",
@@ -142,11 +152,22 @@
 			pattern_color = COLOR_BLACK;
 		var quad_ctr = 0,
 			poly_ctr = 0;
+		var pattern_file_name = "null";
+		var pattern_img;
 		function start() {
 			var canvas = document.getElementById("canvas");
 			ctx = canvas.getContext("2d");
 			canvas.addEventListener('mousedown', get_vertex);
 			canvas.addEventListener('mouseup', draw_vertex);
+
+			document.getElementById("btn_pattern").onchange = function() {
+				var v = document.getElementById("btn_pattern");
+				// alert(v.files[0].name);
+				pattern_file_name = v.files[0].name;
+				pattern_img = new Image();
+				pattern_img.src = pattern_file_name;
+				is_img_pattern = true;
+			};
 		
 		}
 		function select_lcolor(v) {
@@ -163,6 +184,7 @@
 			pattern_color = v.getAttribute("pcolor");
 			var sbox = document.getElementById("sbox");
 			sbox.style.backgroundColor = pattern_color;
+			is_img_pattern = false;
 			console.log("pattern color : " + pattern_color);
 		}
 		function get_vertex(event) {
@@ -320,7 +342,12 @@
 			ctx.lineTo(points[2][0], points[2][1]);
 			ctx.lineTo(points[3][0], points[3][1]);
 			ctx.closePath();
-			ctx.fillStyle = pattern_color;
+			if (is_img_pattern) {
+				var pattern = ctx.createPattern(pattern_img, 'repeat');
+				ctx.fillStyle = pattern;
+			} else {
+				ctx.fillStyle = pattern_color;
+			}
 			ctx.fill();
 			ctx.lineWidth = line_thickness;
 			ctx.strokeStyle = line_color;
@@ -362,7 +389,13 @@
 		}
 		function fill_color() {
 		}
-		function fill_pattern() {
+		function load_pattern() {
+			var pattern = ctx.createPattern(pattern_img, 'repeat');
+
+			// ctx.fillStyle = pattern_color;
+			console.log("loadPattern");
+			console.log(pattern_file_name);
+
 		}
 	</script>
 	<title>2D Simple Graphic Editor</title>
@@ -388,7 +421,9 @@
 		        	<div id="box_brown" onclick="select_pcolor(this)" pcolor="brown"></div>
 		        	<div id="box_purple" onclick="select_pcolor(this)" pcolor="purple"></div>
 		     </div>
-		        <div id="btn_pattern" class='ph-button ph-btn-red' onclick="fill_pattern()">패턴</div>
+		        <!-- <div id="btn_pattern" class='ph-button ph-btn-red' onclick="load_pattern()">패턴</div> -->
+		        <label for="btn_pattern" class='ph-button ph-btn-red'>패턴</label>
+		        <input type="file" id="btn_pattern" class='ph-button ph-btn-red' name="pattern" accept="image/*"/>
 
 		        <p><b>선 색</b></p>
 		        <div class="currcolor" id="lbox"></div>
