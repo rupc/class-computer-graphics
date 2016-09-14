@@ -42,6 +42,17 @@
 		    width:100px;
 		    margin-left:30px;
 		}
+		.currcolor {
+			width:80px;
+			height:30px;
+			float:left;
+			background-color:black;
+			padding-bottom: 0.3cm;
+			margin-top:0.3cm;
+			margin-bottom: 0.5cm;
+			/*margin:1px;*/
+		}
+
 		#color_panel>* {
 			width:30px;
 			height:30px;
@@ -140,6 +151,8 @@
 		}
 		function select_lcolor(v) {
 			line_color = v.getAttribute("lcolor");
+			var lbox = document.getElementById("lbox");
+			lbox.style.backgroundColor = line_color;
 			console.log("line color : " + line_color);
 		}
 		function select_lthick(v) {
@@ -148,6 +161,8 @@
 		}
 		function select_pcolor(v) {
 			pattern_color = v.getAttribute("pcolor");
+			var sbox = document.getElementById("sbox");
+			sbox.style.backgroundColor = pattern_color;
 			console.log("pattern color : " + pattern_color);
 		}
 		function get_vertex(event) {
@@ -198,7 +213,6 @@
 						draw_shapes(draw_mode);
 						
 					}
-
 				}
 			}
 		}
@@ -365,6 +379,7 @@
 		        <div id="btn_polygon" class='ph-button ph-btn-red' onclick="switch_draw_mode(0x08)">다각형</div>
 		        <div id="btn_curve" class='ph-button ph-btn-red' onclick="switch_draw_mode(0x10)">곡선</div>
 		        <div id="btn_fillcolor" class='ph-button ph-btn-red' onclick="fill_color()">색 채우기</div>
+		     <div class="currcolor" id="sbox"></div>
 		     <div id="color_panel">
 		        	<div id="box_black" onclick="select_pcolor(this)" pcolor="black"></div>
 		        	<div id="box_red" onclick="select_pcolor(this)" pcolor="red"></div>
@@ -374,7 +389,9 @@
 		        	<div id="box_purple" onclick="select_pcolor(this)" pcolor="purple"></div>
 		     </div>
 		        <div id="btn_pattern" class='ph-button ph-btn-red' onclick="fill_pattern()">패턴</div>
+
 		        <p><b>선 색</b></p>
+		        <div class="currcolor" id="lbox"></div>
 		        <div id="color_panel">
 		        	<div id="box_black" onclick="select_lcolor(this)" lcolor="black"></div>
 		        	<div id="box_red" onclick="select_lcolor(this)" lcolor="red"></div>
