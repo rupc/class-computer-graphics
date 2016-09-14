@@ -129,7 +129,8 @@
 			  COLOR_PURPLE = "rgba(128,0,128,1)";
 		var line_color = COLOR_BLACK,
 			pattern_color = COLOR_BLACK;
-		var quad_ctr = 0;
+		var quad_ctr = 0,
+			poly_ctr = 0;
 		function start() {
 			var canvas = document.getElementById("canvas");
 			ctx = canvas.getContext("2d");
@@ -161,6 +162,9 @@
 				if (draw_mode == MODE_QUAD) {
 					quad_ctr++;
 				}
+				if (draw_mode == MODE_POLYGON) {
+					poly_ctr++;
+				}
 			} else if (event.button == RIGHT_CLICK) {
 
 			}
@@ -184,10 +188,15 @@
 					}
 				}
 			} else if (event.button == RIGHT_CLICK) {
-				if (draw_mode == MODE_QUAD ||
-					draw_mode == MODE_POLYGON ||
-					draw_mode == MODE_CURVE) {
-					draw_shapes(draw_mode);
+				if (draw_mode == MODE_POLYGON) {
+					if (poly_ctr < 3)	 {
+						console.log("polygon should have 3 points at least");
+					} else {
+						// poly_ctr = 0;
+						draw_shapes(draw_mode);
+						
+					}
+
 				}
 			}
 		}
@@ -220,6 +229,12 @@
 		}
 		function switch_draw_mode(MODE) {
 			draw_mode = MODE;
+			if (draw_mode == MODE_QUAD) {
+				quad_ctr = 0;
+			} 
+			if (draw_mode == MODE_POLYGON) {
+				poly_ctr = 0;
+			}
 			console.log("switch draw mode : " + draw_mode);
 		}
 		function draw_segment() {
@@ -295,7 +310,29 @@
 			ctx.stroke();
 			console.log("drawQuad");
 		}
+		function get_vertexes(n) {
+			var res = new Array();
+			for (var i = vertex_buffer.length - n; 
+					i < vertex_buffer.length; ++i) {
+				res.push(vertex_buffer[i]);
+			}
+			return res;
+		}
 		function draw_polygon() {
+			var points = get_vertexes(poly_ctr);
+			ctx.beginPath();
+			ctx.moveTo(points[0][0], points[0][1]);
+			for (var i = 1; i < poly_ctr; ++i) {
+				ctx.lineTo(points[i][0], points[i][1]);
+			}
+			ctx.closePath();
+			ctx.fillStyle = pattern_color;
+			ctx.fill();
+			ctx.lineWidth = line_thickness;
+			ctx.strokeStyle = line_color;
+			ctx.stroke();
+			console.log("drawPolygon with " + poly_ctr + " points");
+			poly_ctr = 0;
 		}
 		function draw_curve() {
 		}
