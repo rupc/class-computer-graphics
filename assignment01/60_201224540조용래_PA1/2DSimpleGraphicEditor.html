@@ -130,13 +130,15 @@
 	<script type="text/javascript">
 		var ctx;
 		// store currently drawn vertexes and its method to the memory
-		var vertex_storage = new Array();
-		var hint_storage = new Array();
-
+		// var vertex_storage = new Array();
+		// var hint_storage = new Array();
+		var shape_storage = new Array();
 		// store draw method temporarily
-		var hint_buffer = new Array();
+		// var hint_buffer = new Array();
 		// store vertexes temporarily 
 		var vertex_buffer = new Array();
+		var shape_buffer = new Array();
+		var bShape = new Object();
 
 		var draw_mode = 0x00;
 		var LEFT_CLICK = 0,
@@ -162,8 +164,6 @@
 		var pattern_file_name = "null";
 		var pattern_img;
 		// keep drawn shape temporarily
-		var bShape = new Object();
-		var shape_buffer = new Array();
 		function start() {
 			var canvas = document.getElementById("canvas");
 			ctx = canvas.getContext("2d");
@@ -249,27 +249,32 @@
 			}
 		}
 		function draw_shapes(mode) {
+			var points;
 			switch (mode) {
 				case MODE_SEGMENT:
-					draw_segment();
+					points = get2vertex();
+					draw_segment(points);
 					break;
 				case MODE_CIRCLE:
-					draw_circle();
+					points = get2vertex();
+					draw_circle(points);
 					break;
 				case MODE_QUAD:
-					draw_quad();
+					points = get4vertex();
+					draw_quad(points);
 					break;
 				case MODE_POLYGON:
-					draw_polygon();
+					points = get_vertexes(poly_ctr);
+					draw_polygon(points);
 					break;
 				case MODE_CURVE:
-					draw_curve();
+					points = get4vertex();
+					draw_curve(points);
 					break;
 				default:
 					console.log("nothing selected");
 					return;
 			}
-			hint_buffer.push(mode);
 		}
 		function get_mouse_position(canvas, event) {
 			var rect = canvas.getBoundingClientRect();
@@ -288,10 +293,9 @@
 			}
 			console.log("switch draw mode : " + draw_mode);
 		}
-		function draw_segment() {
-			var seg = get2vertex();
-			var src = seg[0],
-				dst = seg[1];
+		function draw_segment(points) {
+			var src = points[0],
+				dst = points[1];
 			// vertex_buffer.pop();
 			// vertex_buffer.pop();
 			ctx.beginPath();
@@ -306,7 +310,7 @@
 			console.log("lineWidth:" + line_thickness);
 
 			bShape.mode = MODE_SEGMENT;
-			bShape.vertexes = seg.slice();
+			bShape.vertexes = points.slice();
 			bShape.lthickness = line_thickness;
 			bShape.lcolor = line_color;
 			shape_buffer.push(jQuery.extend(true, {}, bShape));
@@ -322,10 +326,10 @@
 			}
 		}
 
-		function draw_circle() {
-			var cir = get2vertex();
-			var center = cir[0];
-			var radius = distance_p2p(cir[0], cir[1]);
+		function draw_circle(points) {
+			// var cir = get2vertex();
+			var center = points[0];
+			var radius = distance_p2p(points[0], points[1]);
 			ctx.beginPath();
 			ctx.arc(center[0], center[1], radius, 0, 2*Math.PI, false);
 			ctx.fillStyle = pattern_color;
@@ -338,7 +342,7 @@
 			console.log("radius:" + radius);
 
 			bShape.mode = MODE_CIRCLE;
-			bShape.vertexes = cir.slice();
+			bShape.vertexes = points.slice();
 			bShape.lthickness = line_thickness;
 			bShape.lcolor = line_color;
 			bShape.pcolor = pattern_color;
@@ -348,8 +352,8 @@
 		function distance_p2p(p1, p2) {
 			return Math.sqrt(Math.pow(p1[0]-p2[0], 2) + Math.pow(p1[1]-p2[1], 2));
 		}
-		function draw_quad() {
-			var points = get4vertex();
+		function draw_quad(points) {
+			// var points = get4vertex();
 			ctx.beginPath();
 			ctx.moveTo(points[0][0], points[0][1]);
 			ctx.lineTo(points[1][0], points[1][1]);
@@ -379,16 +383,8 @@
 			shape_buffer.push(jQuery.extend(true, {}, bShape));
 
 		}
-		function get_vertexes(n) {
-			var res = new Array();
-			for (var i = vertex_buffer.length - n; 
-					i < vertex_buffer.length; ++i) {
-				res.push(vertex_buffer[i]);
-			}
-			return res;
-		}
-		function draw_polygon() {
-			var points = get_vertexes(poly_ctr);
+		function draw_polygon(points) {
+			// var points = get_vertexes(poly_ctr);
 			ctx.beginPath();
 			ctx.moveTo(points[0][0], points[0][1]);
 			for (var i = 1; i < poly_ctr; ++i) {
@@ -409,15 +405,15 @@
 			shape_buffer.push(jQuery.extend(true, {}, bShape));
 
 		}
-		function draw_curve() {
-			var points = get4vertex();
+		function draw_curve(points) {
+			// var points = get4vertex();
 			ctx.beginPath();
 			ctx.moveTo(points[0][0], points[0][1]);
 			ctx.bezierCurveTo(points[1][0], points[1][1],points[2][0], points[2][1], points[3][0], points[3][1]);
 			ctx.lineWidth = line_thickness;
 			ctx.strokeStyle = line_color;
 			ctx.stroke();
-			
+
 			bShape.mode = MODE_CURVE;
 			bShape.vertexes = points.slice();
 			bShape.lthickness = line_thickness;
@@ -448,6 +444,15 @@
 				vertex_buffer[vertex_buffer.length-1]
 			];
 		}
+		function get_vertexes(n) {
+			var res = new Array();
+			for (var i = vertex_buffer.length - n; 
+					i < vertex_buffer.length; ++i) {
+				res.push(vertex_buffer[i]);
+			}
+			return res;
+		}
+
 		function fill_color() {
 		}
 		function load_context() {
@@ -456,11 +461,11 @@
 		function save_context() {
 			// var ctx_name = prompt("Enter the name of this context");
 			// alert(ctx_name);
-			vertex_storage = vertex_buffer.slice();
-			hint_storage = hint_buffer.slice();
-			for (var i = 0; i < vertex_storage.length; ++i) {
-				console.log(vertex_storage[i][0] + "," + vertex_storage[i][1]);
-			}
+			// vertex_storage = vertex_buffer.slice();
+			// hint_storage = hint_buffer.slice();
+			// for (var i = 0; i < vertex_storage.length; ++i) {
+			// 	console.log(vertex_storage[i][0] + "," + vertex_storage[i][1]);
+			// }
 			// console.log(vertex_storage);
 		}
 	</script>
