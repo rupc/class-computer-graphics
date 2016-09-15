@@ -250,6 +250,8 @@
 		}
 		function draw_shapes(mode) {
 			var points;
+
+
 			switch (mode) {
 				case MODE_SEGMENT:
 					points = get2vertex();
@@ -274,7 +276,19 @@
 				default:
 					console.log("nothing selected");
 					return;
+
 			}
+			// put the drawn shape into shape_buffer
+			bShape.mode = mode;
+			bShape.vertexes = points.slice();
+			bShape.lthickness = line_thickness;
+			bShape.lcolor = line_color;
+			if (is_img_pattern) {
+				bShape.pimage = pattern;
+			} else {
+				bShape.pcolor = pattern_color;
+			}
+			shape_buffer.push(jQuery.extend(true, {}, bShape));
 		}
 		function get_mouse_position(canvas, event) {
 			var rect = canvas.getBoundingClientRect();
@@ -309,12 +323,12 @@
 			console.log("lineColor:" + line_color);
 			console.log("lineWidth:" + line_thickness);
 
-			bShape.mode = MODE_SEGMENT;
-			bShape.vertexes = points.slice();
-			bShape.lthickness = line_thickness;
-			bShape.lcolor = line_color;
-			shape_buffer.push(jQuery.extend(true, {}, bShape));
-			print_shape_info(bShape);
+			// bShape.mode = MODE_SEGMENT;
+			// bShape.vertexes = points.slice();
+			// bShape.lthickness = line_thickness;
+			// bShape.lcolor = line_color;
+			// shape_buffer.push(jQuery.extend(true, {}, bShape));
+			// print_shape_info(bShape);
 		}
 		function print_shape_info(shape) {
 			console.log("shape information");
@@ -341,12 +355,12 @@
 			console.log("center:" + center[0] + "," + center[1]);
 			console.log("radius:" + radius);
 
-			bShape.mode = MODE_CIRCLE;
-			bShape.vertexes = points.slice();
-			bShape.lthickness = line_thickness;
-			bShape.lcolor = line_color;
-			bShape.pcolor = pattern_color;
-			shape_buffer.push(jQuery.extend(true, {}, bShape));
+			// bShape.mode = MODE_CIRCLE;
+			// bShape.vertexes = points.slice();
+			// bShape.lthickness = line_thickness;
+			// bShape.lcolor = line_color;
+			// bShape.pcolor = pattern_color;
+			// shape_buffer.push(jQuery.extend(true, {}, bShape));
 
 		}
 		function distance_p2p(p1, p2) {
@@ -371,16 +385,17 @@
 			ctx.strokeStyle = line_color;
 			ctx.stroke();
 			console.log("drawQuad");
-			bShape.mode = MODE_QUAD;
-			bShape.vertexes = points.slice();
-			bShape.lthickness = line_thickness;
-			bShape.lcolor = line_color;
-			if (is_img_pattern) {
-				bShape.pimage = pattern;
-			} else {
-				bShape.pcolor = pattern_color;
-			}
-			shape_buffer.push(jQuery.extend(true, {}, bShape));
+			
+			// bShape.mode = MODE_QUAD;
+			// bShape.vertexes = points.slice();
+			// bShape.lthickness = line_thickness;
+			// bShape.lcolor = line_color;
+			// if (is_img_pattern) {
+			// 	bShape.pimage = pattern;
+			// } else {
+			// 	bShape.pcolor = pattern_color;
+			// }
+			// shape_buffer.push(jQuery.extend(true, {}, bShape));
 
 		}
 		function draw_polygon(points) {
@@ -398,11 +413,11 @@
 			ctx.stroke();
 			console.log("drawPolygon with " + poly_ctr + " points");
 			poly_ctr = 0;
-			bShape.mode = MODE_POLYGON;
-			bShape.vertexes = points.slice();
-			bShape.lthickness = line_thickness;
-			bShape.lcolor = line_color;
-			shape_buffer.push(jQuery.extend(true, {}, bShape));
+			// bShape.mode = MODE_POLYGON;
+			// bShape.vertexes = points.slice();
+			// bShape.lthickness = line_thickness;
+			// bShape.lcolor = line_color;
+			// shape_buffer.push(jQuery.extend(true, {}, bShape));
 
 		}
 		function draw_curve(points) {
@@ -414,11 +429,11 @@
 			ctx.strokeStyle = line_color;
 			ctx.stroke();
 
-			bShape.mode = MODE_CURVE;
-			bShape.vertexes = points.slice();
-			bShape.lthickness = line_thickness;
-			bShape.lcolor = line_color;
-			shape_buffer.push(jQuery.extend(true, {}, bShape));
+			// bShape.mode = MODE_CURVE;
+			// bShape.vertexes = points.slice();
+			// bShape.lthickness = line_thickness;
+			// bShape.lcolor = line_color;
+			// shape_buffer.push(jQuery.extend(true, {}, bShape));
 
 		}
 		// get 2 vertexes, which is recently pushed from vertex buffer 
