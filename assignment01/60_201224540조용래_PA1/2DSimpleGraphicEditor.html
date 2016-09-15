@@ -120,7 +120,6 @@
 		}
 		label {
 		   cursor: pointer;
-   /* Style as you please, it will become the visible UI component. */
 		}
 		#btn_pattern {
 		   opacity: 0;
@@ -130,7 +129,15 @@
 	</style>
 	<script type="text/javascript">
 		var ctx;
+		// store currently drawn vertexes and its method to the memory
+		var vertex_storage = new Array();
+		var hint_storage = new Array();
+
+		// store draw method temporarily
+		var hint_buffer = new Array();
+		// store vertexes temporarily 
 		var vertex_buffer = new Array();
+
 		var draw_mode = 0x00;
 		var LEFT_CLICK = 0,
 		 	RIGHT_CLICK = 2;
@@ -154,6 +161,9 @@
 			poly_ctr = 0;
 		var pattern_file_name = "null";
 		var pattern_img;
+		// keep drawn shape temporarily
+		var bShape = new Object();
+		var shape_buffer = new Array();
 		function start() {
 			var canvas = document.getElementById("canvas");
 			ctx = canvas.getContext("2d");
@@ -257,7 +267,9 @@
 					break;
 				default:
 					console.log("nothing selected");
+					return;
 			}
+			hint_buffer.push(mode);
 		}
 		function get_mouse_position(canvas, event) {
 			var rect = canvas.getBoundingClientRect();
@@ -292,30 +304,24 @@
 			console.log("drawSegment");
 			console.log("lineColor:" + line_color);
 			console.log("lineWidth:" + line_thickness);
+
+			bShape.mode = MODE_SEGMENT;
+			bShape.vertexes = seg.slice();
+			bShape.lthickness = line_thickness;
+			bShape.lcolor = line_color;
+			shape_buffer.push(jQuery.extend(true, {}, bShape));
+			print_shape_info(bShape);
 		}
-		// get 2 vertexes, which is recently pushed from vertex buffer 
-		function get2vertex() {
-			if (vertex_buffer.length < 2) {
-				alert("less than 2");
-				throw new Error("vertex buffer's size is less than 2!");
+		function print_shape_info(shape) {
+			console.log("shape information");
+			console.log("mode:" + shape.mode);
+			console.log("thickness:" + shape.lthickness);
+			console.log("lcolor:" + shape.lcolor);
+			for (var i = 0; i < shape.vertexes.length; ++i) {
+				console.log(shape.vertexes[i][0] + "," +shape.vertexes[i][1]);
 			}
-			return [
-				vertex_buffer[vertex_buffer.length-2],
-				vertex_buffer[vertex_buffer.length-1]
-			];
 		}
-		function get4vertex() {
-			if (vertex_buffer.length < 4) {
-				alert("less than 4");
-				throw new Error("vertex buffer's size is less than 4!");
-			}
-			return [
-				vertex_buffer[vertex_buffer.length-4],
-				vertex_buffer[vertex_buffer.length-3],
-				vertex_buffer[vertex_buffer.length-2],
-				vertex_buffer[vertex_buffer.length-1]
-			];
-		}
+
 		function draw_circle() {
 			var cir = get2vertex();
 			var center = cir[0];
@@ -330,6 +336,14 @@
 			console.log("drawCircle");
 			console.log("center:" + center[0] + "," + center[1]);
 			console.log("radius:" + radius);
+
+			bShape.mode = MODE_CIRCLE;
+			bShape.vertexes = cir.slice();
+			bShape.lthickness = line_thickness;
+			bShape.lcolor = line_color;
+			bShape.pcolor = pattern_color;
+			shape_buffer.push(jQuery.extend(true, {}, bShape));
+
 		}
 		function distance_p2p(p1, p2) {
 			return Math.sqrt(Math.pow(p1[0]-p2[0], 2) + Math.pow(p1[1]-p2[1], 2));
@@ -353,6 +367,17 @@
 			ctx.strokeStyle = line_color;
 			ctx.stroke();
 			console.log("drawQuad");
+			bShape.mode = MODE_QUAD;
+			bShape.vertexes = points.slice();
+			bShape.lthickness = line_thickness;
+			bShape.lcolor = line_color;
+			if (is_img_pattern) {
+				bShape.pimage = pattern;
+			} else {
+				bShape.pcolor = pattern_color;
+			}
+			shape_buffer.push(jQuery.extend(true, {}, bShape));
+
 		}
 		function get_vertexes(n) {
 			var res = new Array();
@@ -377,6 +402,12 @@
 			ctx.stroke();
 			console.log("drawPolygon with " + poly_ctr + " points");
 			poly_ctr = 0;
+			bShape.mode = MODE_POLYGON;
+			bShape.vertexes = points.slice();
+			bShape.lthickness = line_thickness;
+			bShape.lcolor = line_color;
+			shape_buffer.push(jQuery.extend(true, {}, bShape));
+
 		}
 		function draw_curve() {
 			var points = get4vertex();
@@ -386,16 +417,51 @@
 			ctx.lineWidth = line_thickness;
 			ctx.strokeStyle = line_color;
 			ctx.stroke();
+			
+			bShape.mode = MODE_CURVE;
+			bShape.vertexes = points.slice();
+			bShape.lthickness = line_thickness;
+			bShape.lcolor = line_color;
+			shape_buffer.push(jQuery.extend(true, {}, bShape));
+
+		}
+		// get 2 vertexes, which is recently pushed from vertex buffer 
+		function get2vertex() {
+			if (vertex_buffer.length < 2) {
+				alert("less than 2");
+				throw new Error("vertex buffer's size is less than 2!");
+			}
+			return [
+				vertex_buffer[vertex_buffer.length-2],
+				vertex_buffer[vertex_buffer.length-1]
+			];
+		}
+		function get4vertex() {
+			if (vertex_buffer.length < 4) {
+				alert("less than 4");
+				throw new Error("vertex buffer's size is less than 4!");
+			}
+			return [
+				vertex_buffer[vertex_buffer.length-4],
+				vertex_buffer[vertex_buffer.length-3],
+				vertex_buffer[vertex_buffer.length-2],
+				vertex_buffer[vertex_buffer.length-1]
+			];
 		}
 		function fill_color() {
 		}
-		function load_pattern() {
-			var pattern = ctx.createPattern(pattern_img, 'repeat');
+		function load_context() {
 
-			// ctx.fillStyle = pattern_color;
-			console.log("loadPattern");
-			console.log(pattern_file_name);
-
+		}
+		function save_context() {
+			// var ctx_name = prompt("Enter the name of this context");
+			// alert(ctx_name);
+			vertex_storage = vertex_buffer.slice();
+			hint_storage = hint_buffer.slice();
+			for (var i = 0; i < vertex_storage.length; ++i) {
+				console.log(vertex_storage[i][0] + "," + vertex_storage[i][1]);
+			}
+			// console.log(vertex_storage);
 		}
 	</script>
 	<title>2D Simple Graphic Editor</title>
@@ -447,8 +513,8 @@
 
 		<canvas id="canvas" width="830" height="700">This browser doesn't support canvas. Use another browser.</canvas>
 		<div id="bth_panel_bottom">
-			<div id="btn_load" class='ph-button ph-btn-green'>불러오기</div>
-			<div id="btn_save" class='ph-button ph-btn-green'>저장</div>
+			<div id="btn_load" onclick = "load_context()" class='ph-button ph-btn-green'>불러오기</div>
+			<div id="btn_save" onclick="save_context()" class='ph-button ph-btn-green'>저장</div>
 		</div>
 	</div>
 </body>
