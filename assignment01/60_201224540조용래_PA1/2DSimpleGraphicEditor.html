@@ -326,13 +326,6 @@
 			console.log("drawSegment");
 			console.log("lineColor:" + line_color);
 			console.log("lineWidth:" + line_thickness);
-
-			// bShape.mode = MODE_SEGMENT;
-			// bShape.vertexes = points.slice();
-			// bShape.lthickness = line_thickness;
-			// bShape.lcolor = line_color;
-			// shape_buffer.push(jQuery.extend(true, {}, bShape));
-			// print_shape_info(bShape);
 		}
 		function print_shape_info(shape) {
 			console.log("shape information");
@@ -361,13 +354,6 @@
 			console.log("center:" + center[0] + "," + center[1]);
 			console.log("radius:" + radius);
 
-			// bShape.mode = MODE_CIRCLE;
-			// bShape.vertexes = points.slice();
-			// bShape.lthickness = line_thickness;
-			// bShape.lcolor = line_color;
-			// bShape.pcolor = pattern_color;
-			// shape_buffer.push(jQuery.extend(true, {}, bShape));
-
 		}
 		function distance_p2p(p1, p2) {
 			return Math.sqrt(Math.pow(p1[0]-p2[0], 2) + Math.pow(p1[1]-p2[1], 2));
@@ -391,17 +377,6 @@
 			ctx.strokeStyle = line_color;
 			ctx.stroke();
 			console.log("drawQuad");
-			
-			// bShape.mode = MODE_QUAD;
-			// bShape.vertexes = points.slice();
-			// bShape.lthickness = line_thickness;
-			// bShape.lcolor = line_color;
-			// if (is_img_pattern) {
-			// 	bShape.pimage = pattern;
-			// } else {
-			// 	bShape.pcolor = pattern_color;
-			// }
-			// shape_buffer.push(jQuery.extend(true, {}, bShape));
 
 		}
 		function draw_polygon(points) {
@@ -419,11 +394,6 @@
 			ctx.stroke();
 			console.log("drawPolygon with " + poly_ctr + " points");
 			poly_ctr = 0;
-			// bShape.mode = MODE_POLYGON;
-			// bShape.vertexes = points.slice();
-			// bShape.lthickness = line_thickness;
-			// bShape.lcolor = line_color;
-			// shape_buffer.push(jQuery.extend(true, {}, bShape));
 
 		}
 		function draw_curve(points) {
@@ -434,12 +404,6 @@
 			ctx.lineWidth = line_thickness;
 			ctx.strokeStyle = line_color;
 			ctx.stroke();
-
-			// bShape.mode = MODE_CURVE;
-			// bShape.vertexes = points.slice();
-			// bShape.lthickness = line_thickness;
-			// bShape.lcolor = line_color;
-			// shape_buffer.push(jQuery.extend(true, {}, bShape));
 
 		}
 		// get 2 vertexes, which is recently pushed from vertex buffer 
@@ -528,6 +492,7 @@
 		function print_point(xy) {
 			console.log(xy[0] + "," + xy[1]);
 		}
+		// Aha... 배열을 복사할땐 그냥 '=' 하면 안 되는 데... 당연한 건데 
 		function save_context() {
 			var ctx_name = prompt("Enter the name of current context to save");
 			// alert(ctx_name);
