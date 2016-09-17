@@ -90,7 +90,7 @@
 			float:left;
 			overflow:hidden;
 			display: inline-block;
-			margin-left:500px;
+			margin-left:300px;
 		}
 		#bth_panel_bottom>* {
 			float:left;
@@ -139,6 +139,7 @@
 		var vertex_buffer = new Array();
 		var shape_buffer = new Array();
 		var bShape = new Object();
+		var ctx_names = new Array();
 
 		var draw_mode = 0x00;
 		var LEFT_CLICK = 0,
@@ -163,6 +164,7 @@
 			poly_ctr = 0;
 		var pattern_file_name = "null";
 		var pattern_img;
+		var is_loading = false;
 		// keep drawn shape temporarily
 		function start() {
 			var canvas = document.getElementById("canvas");
@@ -250,8 +252,6 @@
 		}
 		function draw_shapes(mode) {
 			var points;
-
-
 			switch (mode) {
 				case MODE_SEGMENT:
 					points = get2vertex();
@@ -279,12 +279,16 @@
 
 			}
 			// put the drawn shape into shape_buffer
+			if (is_loading) {
+				return;
+			}
 			bShape.mode = mode;
 			bShape.vertexes = points.slice();
 			bShape.lthickness = line_thickness;
 			bShape.lcolor = line_color;
+			bShape.hasImage = is_img_pattern;
 			if (is_img_pattern) {
-				bShape.pimage = pattern;
+				bShape.pimage = pattern_img;
 			} else {
 				bShape.pcolor = pattern_color;
 			}
@@ -335,6 +339,8 @@
 			console.log("mode:" + shape.mode);
 			console.log("thickness:" + shape.lthickness);
 			console.log("lcolor:" + shape.lcolor);
+			console.log("hasImage:" + shape.hasImage);
+
 			for (var i = 0; i < shape.vertexes.length; ++i) {
 				console.log(shape.vertexes[i][0] + "," +shape.vertexes[i][1]);
 			}
@@ -471,17 +477,72 @@
 		function fill_color() {
 		}
 		function load_context() {
+			var ctx_name = prompt("Enter the name of context to be loaded");
+			if (typeof shape_storage[ctx_name] == 'undefined') {
+				alert("There is nothing context named by " + ctx_name);
+				return;
+			}
+			console.log(ctx_name + "를 불러옴");
+			ctx.clearRect(0, 0, canvas.width, canvas.height);
+			// jQuery.extend(true, {}, shape_buffer);
+			var shapes = shape_storage[ctx_name];
+			shape_buffer = [];
+			console.log("shapes size:" +shapes.length);
+			// shape_buffer = shapes;
+			for (var i = 0; i < shapes.length; ++i) {
+				shape_buffer.push(jQuery.extend(true,{},shapes[i]));
+			}
+			// vertex_buffer = null;
+			vertex_buffer = [];
+			is_loading = true;
+			console.log(ctx_name + "가 포함하는 도형의 갯수:" + shapes.length);
+			for (var i = 0; i < shapes.length; ++i) {
+				console.log(shapes[i].mode);
+				var nOfPoints = shapes[i].vertexes.length;
+				for (var j = 0; j < nOfPoints; ++j) {
+					var xy = shapes[i].vertexes[j];
+					console.log(xy[0] + "," + xy[1]);
+					vertex_buffer.push(xy);
+					// print_point(xy);
+				}
+				if (shapes[i].mode == MODE_POLYGON) {
+					poly_ctr = nOfPoints;
+				}
+				line_thickness = shapes[i].lthickness;
+				line_color = shapes[i].lcolor;
+				is_img_pattern = shapes[i].hasImage;
 
+				if (is_img_pattern) {
+					pattern_img = shapes[i].pimage;
+				} else {
+					pattern_color = shapes[i].pcolor;
+				}
+				// console.log(nOfPoints);
+				// console.log(vertex_buffer.length);
+				draw_shapes(shapes[i].mode);
+			}		
+			poly_ctr = 0;
+			quad_ctr = 0;	
+			is_loading = false;
+		}
+		function print_point(xy) {
+			console.log(xy[0] + "," + xy[1]);
 		}
 		function save_context() {
-			// var ctx_name = prompt("Enter the name of this context");
+			var ctx_name = prompt("Enter the name of current context to save");
 			// alert(ctx_name);
-			// vertex_storage = vertex_buffer.slice();
-			// hint_storage = hint_buffer.slice();
-			// for (var i = 0; i < vertex_storage.length; ++i) {
-			// 	console.log(vertex_storage[i][0] + "," + vertex_storage[i][1]);
-			// }
-			// console.log(vertex_storage);
+			console.log("nOfShapes:" + shape_buffer.length);
+			// var draw_context = new Object();
+			// draw_context.name = ctx_name;
+			ctx_names.push(ctx_name);
+			// jQuery.extend(true, {}, shape_buffer);
+			shape_storage[ctx_name] = new Array();
+			for (var i = 0; i < shape_buffer.length; ++i) {
+				shape_storage[ctx_name].push(jQuery.extend(true,{}, shape_buffer[i]));
+			}
+			console.log("저장된 도형들의 갯수:"+shape_storage[ctx_name].length);
+			console.log("이름 " + ctx_name + "으로 저장됨");
+			
 		}
 	</script>
 	<title>2D Simple Graphic Editor</title>
