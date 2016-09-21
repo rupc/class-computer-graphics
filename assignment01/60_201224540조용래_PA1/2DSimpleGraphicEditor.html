@@ -46,10 +46,11 @@
 			width:80px;
 			height:30px;
 			float:left;
-			background-color:black;
+			background-color:white;
 			padding-bottom: 0.3cm;
 			margin-top:0.3cm;
 			margin-bottom: 0.5cm;
+			border:1px dotted black;
 			/*margin:1px;*/
 		}
 
@@ -97,7 +98,6 @@
 			/*vertical-align: middle;*/
 			margin:10px;
 			width:100px;
-			
 		}
 		#thick_panel {
 			width:80px;
@@ -126,6 +126,7 @@
 		   position: absolute;
 		   z-index: -1;
 		}
+
 	</style>
 	<script type="text/javascript">
 		var ctx;
@@ -157,14 +158,18 @@
 			  COLOR_GREEN = "rgba(0,128,0,1.0)",
 			  COLOR_BLUE = "rgba(0,0,255,1)",
 			  COLOR_BROWN = "rgba(128,0,0,1)",
-			  COLOR_PURPLE = "rgba(128,0,128,1)";
+			  COLOR_PURPLE = "rgba(128,0,128,1)",
+			  COLOR_WHITE = "white"; // white is default color;
+		const COLOR_DEFAULT = "rgba(0,0,0,0)";
 		var line_color = COLOR_BLACK,
-			pattern_color = COLOR_BLACK;
+			pattern_color = "white",
+			recent_color;
 		var quad_ctr = 0,
 			poly_ctr = 0;
 		var pattern_file_name = "null";
 		var pattern_img;
-		var is_loading = false;
+		var is_loading = false,
+			is_fill_color = false;
 		// keep drawn shape temporarily
 		function start() {
 			var canvas = document.getElementById("canvas");
@@ -193,11 +198,13 @@
 			console.log("line thickness : " + line_thickness);
 		}
 		function select_pcolor(v) {
-			pattern_color = v.getAttribute("pcolor");
+			recent_color = v.getAttribute("pcolor");
+			// pattern_color = v.getAttribute("pcolor");
+
 			var sbox = document.getElementById("sbox");
-			sbox.style.backgroundColor = pattern_color;
+			sbox.style.backgroundColor = recent_color;
 			is_img_pattern = false;
-			console.log("pattern color : " + pattern_color);
+			console.log("pattern color : " + recent_color);
 		}
 		function get_vertex(event) {
 			if (draw_mode == MODE_NO_DRAW) {
@@ -282,6 +289,11 @@
 			if (is_loading) {
 				return;
 			}
+			if (is_fill_color) {
+				pattern_color = COLOR_DEFAULT;
+				return;
+			}
+
 			bShape.mode = mode;
 			bShape.vertexes = points.slice();
 			bShape.lthickness = line_thickness;
@@ -293,6 +305,9 @@
 				bShape.pcolor = pattern_color;
 			}
 			shape_buffer.push(jQuery.extend(true, {}, bShape));
+		}
+		function get_recent_shape() {
+			return shape_buffer[shape_buffer.length-1];
 		}
 		function get_mouse_position(canvas, event) {
 			var rect = canvas.getBoundingClientRect();
@@ -439,6 +454,21 @@
 		}
 
 		function fill_color() {
+			var recent_shape = get_recent_shape();
+			if (recent_shape.mode == MODE_SEGMENT ||
+				recent_shape.mode == MODE_CURVE ||
+				recent_shape.mode == MODE_NO_DRAW) {
+				console.log("color can fills circle, quad, polygon");
+				return;
+			}
+			if (recent_shape.mode == MODE_POLYGON) {
+				poly_ctr = recent_shape.vertexes.length;
+			}
+			pattern_color = recent_color;
+			is_fill_color = true;
+			draw_shapes(recent_shape.mode);
+			is_fill_color = false;
+			
 		}
 		function load_context() {
 			var ctx_name = prompt("Enter the name of context to be loaded");
@@ -534,6 +564,7 @@
 		        	<div id="box_purple" onclick="select_pcolor(this)" pcolor="purple"></div>
 		     </div>
 		        <!-- <div id="btn_pattern" class='ph-button ph-btn-red' onclick="load_pattern()">패턴</div> -->
+		        <!-- <p id="blank">dd</p> -->
 		        <label for="btn_pattern" class='ph-button ph-btn-red'>패턴</label>
 		        <input type="file" id="btn_pattern" class='ph-button ph-btn-red' name="pattern" accept="image/*"/>
 
