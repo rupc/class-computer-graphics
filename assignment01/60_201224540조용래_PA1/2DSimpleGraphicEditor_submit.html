@@ -133,12 +133,13 @@
 		   /*top:-10px;*/
 		}
 		#blank {
-			opacity: 0;
+			/*opacity: 0;*/
 			/*display:none;*/
 			/*height:10px;*/
 			/*height:100%;*/
 			margin:0;
 			font-size:10%;
+			color:white;
 		}
 	</style>
 	<script type="text/javascript">
@@ -374,7 +375,7 @@
 			var radius = distance_p2p(points[0], points[1]);
 			ctx.beginPath();
 			ctx.arc(center[0], center[1], radius, 0, 2*Math.PI, false);
-			ctx.fillStyle = pattern_color;
+			ctx.fillStyle = COLOR_DEFAULT;
 			ctx.fill();
 			ctx.lineWidth = line_thickness;
 			ctx.strokeStyle = line_color;
@@ -416,7 +417,7 @@
 				ctx.lineTo(points[i][0], points[i][1]);
 			}
 			ctx.closePath();
-			ctx.fillStyle = pattern_color;
+			ctx.fillStyle = COLOR_DEFAULT;
 			ctx.fill();
 			ctx.lineWidth = line_thickness;
 			ctx.strokeStyle = line_color;
@@ -490,28 +491,21 @@
 				alert("There is nothing context named by " + ctx_name);
 				return;
 			}
-			console.log(ctx_name + "를 불러옴");
 			ctx.clearRect(0, 0, canvas.width, canvas.height);
-			// jQuery.extend(true, {}, shape_buffer);
 			var shapes = shape_storage[ctx_name];
 			shape_buffer = [];
 			console.log("shapes size:" +shapes.length);
-			// shape_buffer = shapes;
 			for (var i = 0; i < shapes.length; ++i) {
 				shape_buffer.push(jQuery.extend(true,{},shapes[i]));
 			}
-			// vertex_buffer = null;
 			vertex_buffer = [];
 			is_loading = true;
-			console.log(ctx_name + "가 포함하는 도형의 갯수:" + shapes.length);
 			for (var i = 0; i < shapes.length; ++i) {
 				console.log(shapes[i].mode);
 				var nOfPoints = shapes[i].vertexes.length;
 				for (var j = 0; j < nOfPoints; ++j) {
 					var xy = shapes[i].vertexes[j];
-					console.log(xy[0] + "," + xy[1]);
 					vertex_buffer.push(xy);
-					// print_point(xy);
 				}
 				if (shapes[i].mode == MODE_POLYGON) {
 					poly_ctr = nOfPoints;
@@ -525,8 +519,6 @@
 				} else {
 					pattern_color = shapes[i].pcolor;
 				}
-				// console.log(nOfPoints);
-				// console.log(vertex_buffer.length);
 				draw_shapes(shapes[i].mode);
 			}		
 			poly_ctr = 0;
@@ -539,12 +531,8 @@
 		// Aha... 배열을 복사할땐 그냥 '=' 하면 안 되는 데... 당연한 건데 
 		function save_context() {
 			var ctx_name = prompt("Enter the name of current context to save");
-			// alert(ctx_name);
 			console.log("nOfShapes:" + shape_buffer.length);
-			// var draw_context = new Object();
-			// draw_context.name = ctx_name;
 			ctx_names.push(ctx_name);
-			// jQuery.extend(true, {}, shape_buffer);
 			shape_storage[ctx_name] = new Array();
 			for (var i = 0; i < shape_buffer.length; ++i) {
 				shape_storage[ctx_name].push(jQuery.extend(true,{}, shape_buffer[i]));
@@ -593,7 +581,7 @@
 		        	<div id="box_purple" onclick="select_lcolor(this)" lcolor="purple"></div>
 
 		        </div>
-		        <div id="blank" style="height:50px">blank</div>
+		        <div id="blank">blank</div>
 		        <p><b>선 굵기</b></p>
 		        <div id="thick_panel">
 		        	<div id="line_thick1" onclick="select_lthick(this)" lthick="2"></div>
