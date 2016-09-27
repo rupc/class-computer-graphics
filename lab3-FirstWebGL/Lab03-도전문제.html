@@ -93,7 +93,21 @@
     
             // Setup Geometry : 삼각형을 위한 정점 정보 - 배열에 저장
             vertices = new Float32Array([
-               -0.5,-0.5,0.5,-0.5,0.0,0.5  // Triangle-Coordinates
+               0.5, -0.5, 0,
+               0.5, 0.5,  0,
+               -0.5, 0,   0,
+
+               0.5, -0.5, 0,
+               0.5, 0.5, 0,
+               0,0,0.5,
+
+               -0.5,0,0,
+               0.5,0.5,0,
+               0,0,0.5,
+
+               0.5,-0.5,0,
+               -0.5,0,0,
+               0,0,0.5
             ]);
     
             vbuffer = gl.createBuffer();
@@ -104,7 +118,7 @@
 
          function drawScene()
          {
-         	itemSize = 2; // we have 2 coordinates (x,y)
+         	itemSize = 3; // we have 2 coordinates (x,y,z)
             numItems = vertices.length / itemSize; // number of triangles
     
             
@@ -112,7 +126,7 @@
             gl.useProgram(program);
     
             program.uColor = gl.getUniformLocation(program, "uColor");
-            gl.uniform4fv(program.uColor, [1.0, 0.0, 0.0, 1.0]);
+            gl.uniform4fv(program.uColor, [0.0, 0.0, 0.0, 1.0]);
     
             program.aVertexPosition = gl.getAttribLocation(program, "aVertexPosition");
             gl.enableVertexAttribArray(program.aVertexPosition);
@@ -141,7 +155,7 @@
     
             // Draw:
             gl.drawArrays(gl.TRIANGLES, 0, numItems);
-            
+
          }
    	</script> 
    </head>
@@ -151,12 +165,12 @@
       <canvas id="canvas" width="512" height="512">
       		Your browser does not support the  HTML5 canvas element.
       </canvas>
-      <div id="btn_pannel">
+<!--       <div id="btn_pannel">
          <button type="button" name="green" onclick="change_color(this)">green</button>
          <button type="button" name="red" onclick="change_color(this)">red</button>
          <button type="button" name="black" onclick="change_color(this)">black</button>
          <button type="button" name="blue" onclick="change_color(this)">blue</button>
          
       </div>
-   </body>
+ -->   </body>
    </html>
