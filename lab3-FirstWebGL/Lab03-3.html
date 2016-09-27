@@ -1,0 +1,133 @@
+<html>
+<head>
+
+   <script id="vertexshader" type="x-shader">
+      attribute vec2 aVertexPosition;
+ 
+      void main() {
+      gl_Position = vec4(aVertexPosition, 0.0, 1.0);
+      }
+   </script>
+
+   <script id="fragmentshader" type="x-shader">
+      #ifdef GL_ES
+      precision highp float;
+      #endif
+ 
+      uniform vec4 uColor;
+ 
+      void main() {
+      gl_FragColor = uColor;
+      }
+   </script>
+   <script type="text/javascript">
+      var canvas=null, gl=null, v=null, f=null, vs=null, fs=null,vertices=null;
+      function initWebGL()
+      {
+         canvas = document.getElementById("canvas");
+         try{
+         	 gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
+         }catch(e){
+         }
+      }
+
+      function main()
+      {
+         initWebGL();
+ 
+         if(gl){
+         	 setupWebGL(); //WebGL환경설정
+         	 initShaders();     //Shader 초기화
+         	 setupBuffers();   // drawing을 위한 버퍼 설정
+         	 drawScene();    // 원하는 object drawing
+         }else{
+         	 alert("Error:Your browser does not appear to support WebGL.");
+         }
+      }
+
+     function setupWebGL()
+      {
+      	  // Viewport
+         gl.viewport(0, 0, canvas.width, canvas.height);
+        // gl.clearColor(0, 0, 0, 1);
+         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+      }
+      function initShaders()
+      {
+      	           
+         // Setup Shaders:문서(DOM)로 부터 vertex/fragment shader source code를 가져옴 
+         v = document.getElementById("vertexshader").firstChild.nodeValue;
+         f = document.getElementById("fragmentshader").firstChild.nodeValue;
+         //정점 세이더 생성 
+         vs = gl.createShader(gl.VERTEX_SHADER);
+         //문서에서 정점세이더 소스코드 연결
+         gl.shaderSource(vs, v);
+         //세이더를 컴파일함
+         gl.compileShader(vs);
+ 
+         if (!gl.getShaderParameter(vs, gl.COMPILE_STATUS))
+            alert(gl.getShaderInfoLog(vs));
+         fs = gl.createShader(gl.FRAGMENT_SHADER);
+         gl.shaderSource(fs, f);
+         gl.compileShader(fs);
+ 
+         if (!gl.getShaderParameter(fs, gl.COMPILE_STATUS))
+            alert(gl.getShaderInfoLog(fs));
+
+
+        //프로그램을 생성하고 그것을 세이더와 연결함
+         program = gl.createProgram();
+         gl.attachShader(program, vs);
+         gl.attachShader(program, fs);
+         gl.linkProgram(program);
+ 
+      }
+ 
+      function setupBuffers()
+      {
+      	 if (!gl.getProgramParameter(program, gl.LINK_STATUS))
+            alert(gl.getProgramInfoLog(program));
+ 
+         // Setup Geometry : 삼각형을 위한 정점 정보 - 배열에 저장
+         vertices = new Float32Array([
+            -0.5,-0.5,0.5,-0.5,0.0,0.5  // Triangle-Coordinates
+         ]);
+ 
+         vbuffer = gl.createBuffer();
+         gl.bindBuffer(gl.ARRAY_BUFFER, vbuffer);
+         gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+ 
+      }
+
+      function drawScene()
+      {
+      	 itemSize = 2; // we have 2 coordinates (x,y)
+         numItems = vertices.length / itemSize; // number of triangles
+ 
+         
+         // Setup Geometry:
+         gl.useProgram(program);
+ 
+         program.uColor = gl.getUniformLocation(program, "uColor");
+         gl.uniform4fv(program.uColor, [1.0, 0.0, 0.0, 1.0]);
+ 
+         program.aVertexPosition = gl.getAttribLocation(program, "aVertexPosition");
+         gl.enableVertexAttribArray(program.aVertexPosition);
+         gl.vertexAttribPointer(program.aVertexPosition, itemSize, gl.FLOAT, false, 0, 0);
+ 
+         // Draw:
+         gl.drawArrays(gl.TRIANGLES, 0, numItems);
+
+      }
+    
+	</script> 
+</head>
+
+<body onload="main()">
+
+   <canvas id="canvas" width="512" height="512">
+   		Your browser does not support the  HTML5 canvas element.
+   </canvas>
+
+</body>
+</html>
