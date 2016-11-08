@@ -1,0 +1,53 @@
+<html>
+
+<script id="vertex-shader" type="x-shader/x-vertex">
+attribute vec3 vPosition;
+attribute vec4 vColor;
+
+uniform mat4 uMVMatrix;
+uniform mat4 uPMatrix;
+
+varying vec4 fColor;
+
+void
+main()
+{
+    gl_Position = uPMatrix * uMVMatrix * vec4(vPosition, 1.0);
+    fColor = vColor;
+}
+</script>
+
+<script id="fragment-shader" type="x-shader/x-fragment">
+
+precision mediump float;
+
+varying vec4 fColor;
+void
+main()
+{
+    gl_FragColor = fColor;
+}
+</script>
+
+<script type="text/javascript" src="webgl-utils.js"></script>
+<script type="text/javascript" src="initShaders.js"></script>
+<script type="text/javascript" src="MV.js"></script>
+<script type="text/javascript" src="lab05.js"></script>
+
+<head>
+<title>Lab05</title>
+</head>
+<body>
+<div>
+<canvas id="gl-canvas" width="512"" height="512"
+Oops ... your browser doesn't support the HTML5 canvas element
+</canvas>
+</div>
+<button id= "obj_stop">STOP</button>
+<button id= "obj_rotation">Rotation</button>
+<button id= "obj_revolution">Revolution</button>
+<button id= "obj_both">Rotation+Revolution</button>
+
+
+</body>
+</html>
