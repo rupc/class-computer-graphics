@@ -1,0 +1,84 @@
+<html>
+<!-- Gorud 셰이딩 -->
+<script id="vertex-shader" type="x-shader/x-vertex">
+attribute  vec3 vPosition;
+attribute  vec3 vNormal;
+varying    vec4 fColor;
+//lighting과 shading 값
+uniform vec4 ambientProduct, diffuseProduct, specularProduct;
+uniform mat4 uMVMatrix;
+uniform mat4 uPMatrix;
+uniform mat4 uLookAtMatrix;
+
+uniform vec4 lightPosition;
+uniform float shininess;
+
+void main()
+{
+    vec3 pos = (uMVMatrix *  vec4(vPosition, 1.0)).xyz;
+    
+    //fixed light postion
+    vec3 light = (lightPosition).xyz;
+    vec3 L = normalize( light - pos );
+
+	
+    vec3 E = normalize( -pos );
+    vec3 H = normalize( L + E );
+    
+    vec4 NN = vec4(vNormal,0);
+
+    // Transform vertex normal into eye coordinates
+    vec3 N = normalize( (uMVMatrix*NN).xyz);
+
+    // Compute terms in the illumination equation
+    vec4 ambient = ambientProduct;
+
+    float Kd = max( dot(L, N), 0.0 );
+    vec4  diffuse = Kd*diffuseProduct;
+
+    float Ks = pow( max(dot(N, H), 0.0), shininess );
+    vec4  specular = Ks * specularProduct;
+    
+    if( dot(L, N) < 0.0 ) {
+		specular = vec4(0.0, 0.0, 0.0, 1.0);
+    } 
+	
+    gl_Position = uPMatrix *uLookAtMatrix * uMVMatrix * vec4(vPosition, 1.0);
+    fColor = ambient + diffuse + specular;
+    fColor.a = 1.0;
+}
+</script>
+
+<script id="fragment-shader" type="x-shader/x-fragment">
+
+precision mediump float;
+
+varying vec4 fColor;
+void
+main()
+{
+    gl_FragColor = fColor;
+}
+</script>
+
+<script type="text/javascript" src="webgl-utils.js"></script>
+<script type="text/javascript" src="initShaders.js"></script>
+<script type="text/javascript" src="MV.js"></script>
+
+ <script type="text/javascript" src="lab06.js"></script>
+
+<head>
+<title>Lab06</title>
+</head>
+<body>
+<div>
+<canvas id="gl-canvas" width="512"" height="512"
+Oops ... your browser doesn't support the HTML5 canvas element
+</canvas>
+</div>
+<button id= "obj_stop">STOP</button>
+<button id= "obj_rotation">Rotation</button>
+<button id= "obj_revolution">Revolution</button>
+<button id= "obj_both">Rotation+Revolution</button>
+</body>
+</html>
